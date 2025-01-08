@@ -10,7 +10,7 @@ RUN npm run build
 
 FROM nginx:1.18.0-alpine
 
-# Copie de la configuration Nginx
+# Copie de la con figuration Nginx
 COPY  ./webserver/default.conf /etc/nginx/conf.d/default.conf
 
 # Copie des applications front-end construites
