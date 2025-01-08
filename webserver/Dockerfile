@@ -1,29 +1,17 @@
-# Étape 1 : Construire l'application React avec Vite
-FROM node:lts-alpine3.12 as build
+FROM node:lts-alpine3.12 as build1
 
-# Définir le répertoire de travail
 WORKDIR /lexydocs
-
-# Copier les fichiers de dépendances
-COPY package.json package-lock.json ./
-
-# Installer les dépendances
+COPY ./lexydocs/package.json ./
+COPY ./lexydocs/package-lock.json ./
 RUN npm install
-
-# Copier le reste des fichiers du projet
-COPY . .
-
-# Construire l'application React avec Vite
+COPY ./lexydocs/ ./
 RUN npm run build
 
-# Étape 2 : Servir l'application avec Nginx
+
 FROM nginx:1.18.0-alpine
 
-# Copier les fichiers construits par Vite
-COPY --from=build /lexydocs/dist /usr/share/nginx/html/frontend1
+# Copie de la configuration Nginx
+COPY  ./webserver/default.conf /etc/nginx/conf.d/default.conf
 
-# Exposer le port 80
-EXPOSE 80
-
-# Démarrer Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Copie des applications front-end construites
+COPY --from=build1 /lexydocs/dist /usr/share/nginx/html/frontend1
