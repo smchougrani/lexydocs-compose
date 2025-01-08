@@ -1,5 +1,6 @@
-services:
+version: '3.8'
 
+services:
   # Certbot Service
   certbot:
     image: certbot/certbot:latest
@@ -18,6 +19,19 @@ services:
     volumes:
       - static:/static
 
+  # React Frontend Service (avec Vite)
+  react_frontend:
+    build:
+      context: ./lexydocs  # Chemin vers le dossier de votre projet React
+      dockerfile: Dockerfile  # Nom du Dockerfile pour React
+    ports:
+      - "3000:3000"  # Port pour le développement avec Vite (optionnel)
+    volumes:
+      - ./lexydocs:/lexydocs  # Montage du code source pour le développement
+      - /lexydocs/node_modules  # Évite de surcharger node_modules dans le conteneur
+    environment:
+      - NODE_ENV=development  # Mode développement (optionnel)
+
   # Nginx Service
   nginx:
     build:
@@ -31,8 +45,10 @@ services:
       - static:/static
       - ./certbot/www:/var/www/certbot/:rw
       - ./certbot/conf/:/etc/nginx/ssl/:rw
+      - ./lexydocs/dist:/usr/share/nginx/html/frontend1  # Montage des fichiers construits par Vite
     depends_on:
       - django_gunicorn
+      - react_frontend
 
 volumes:
   static:
