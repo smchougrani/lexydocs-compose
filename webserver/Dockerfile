@@ -1,4 +1,4 @@
-FROM node:lts-alpine3.12 as build1
+FROM node:18-alpine as build1
 
 WORKDIR /lexydocs
 COPY ./lexydocs/package.json ./
