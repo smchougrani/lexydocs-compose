@@ -1,23 +1,24 @@
-version: '3.8'
-
 services:
+
+  # Certbot Service
   certbot:
     image: certbot/certbot:latest
     volumes:
       - ./certbot/www/:/var/www/certbot/:rw
       - ./certbot/conf/:/etc/letsencrypt/:rw
-    command: certonly --webroot -w /var/www/certbot --email your-email@example.com --agree-tos --no-eff-email -d api.lexy-docs.com -d app.lexy-docs.com --force-renewal
 
+  # Django Gunicorn Service
   django_gunicorn:
     build:
-      context: ./lexyapi/src
+      context: ./eparkAPI/src
     env_file:
-      - ./lexyapi/src/project/.env
+      - ./eparkAPI/src/project/.env
     ports:
       - "8000:8000"
     volumes:
       - static:/static
 
+  # Nginx Service
   nginx:
     build:
       context: .
@@ -30,7 +31,6 @@ services:
       - static:/static
       - ./certbot/www:/var/www/certbot/:rw
       - ./certbot/conf/:/etc/nginx/ssl/:rw
-      - ./lexydocs/dist:/usr/share/nginx/html/frontend1
     depends_on:
       - django_gunicorn
 
