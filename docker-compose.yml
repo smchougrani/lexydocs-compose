@@ -1,0 +1,38 @@
+services:
+
+  # Certbot Service
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/www/:/var/www/certbot/:rw
+      - ./certbot/conf/:/etc/letsencrypt/:rw
+
+  # Django Gunicorn Service
+  django_gunicorn:
+    build:
+      context: ./lexyapi/src
+    env_file:
+      - ./lexyapi/src/project/.env
+    ports:
+      - "8000:8000"
+    volumes:
+      - static:/static
+
+  # Nginx Service
+  nginx:
+    build:
+      context: .
+      dockerfile: ./webserver/Dockerfile
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - static:/static
+      - ./certbot/www:/var/www/certbot/:rw
+      - ./certbot/conf/:/etc/nginx/ssl/:rw
+    depends_on:
+      - django_gunicorn
+
+volumes:
+  static:
