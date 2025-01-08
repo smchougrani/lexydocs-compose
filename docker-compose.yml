@@ -10,9 +10,9 @@ services:
   # Django Gunicorn Service
   django_gunicorn:
     build:
-      context: ./eparkAPI/src
+      context: ./lexyapi/src
     env_file:
-      - ./eparkAPI/src/project/.env
+      - ./lexyapi/src/project/.env
     ports:
       - "8000:8000"
     volumes:
